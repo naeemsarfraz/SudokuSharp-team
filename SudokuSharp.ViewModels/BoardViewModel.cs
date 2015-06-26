@@ -64,16 +64,12 @@ namespace SudokuSharp.ViewModels
 
         private void analyse()
         {
-            for (int x = 0; x < Cells.Length; x++)
-            {
-                for (int y = 0; y < Cells[x].Length; y++)
+            forEachCell((x, y, cell) =>
                 {
-                    var rootCell = GetRootCellIndex(x, y);
-
-                    if (Cells[x][y].Number.HasValue)
+                    if (cell.Number.HasValue)
                     {
-                        Cells[x][y].PossibleValues.Clear();
-                        continue;
+                        cell.PossibleValues.Clear();
+                        return;
                     }
 
                     var available = AvailableNumbers(new Point(x, y));
@@ -81,27 +77,28 @@ namespace SudokuSharp.ViewModels
                     Debug.WriteLine("cell[{0}][{1}] has {2} numbers available {{{3}}}",
                         x, y, available.Count, String.Join(",", available.ToArray()));
 
-                    Cells[x][y].PossibleValues = available;
-                }
-            }
+                    cell.PossibleValues = available;
+                });
         }
 
         private void solveWhereOnlyOneNumberIsAvailable()
         {
-            forEachRow((row) =>
-                forEachColumnInRow(row, (x, y, cell) =>
+            forEachCell((x, y, cell) =>
                 {
                     if (Cells[x][y].Number == null && cell.PossibleValues.Count == 1)
                         SetCell(x, y, cell.PossibleValues.First());
-                }));
+                });
         }
 
-        private void forEachColumnInRow(int x, Action<int, int, CellViewModel> onEachColumnInRow)
+        private void forEachCell(Action<int, int, CellViewModel> onEachCell)
         {
-            for (int y = 0; y < Cells[x].Length; y++)
+            forEachRow((row) =>
             {
-                onEachColumnInRow(x, y, Cells[x][y]);
-            }
+                for (int y = 0; y < Cells[row].Length; y++)
+                {
+                    onEachCell(row, y, Cells[row][y]);
+                }
+            });
         }
 
         private void forEachRow(Action<int> onEachRow)
@@ -117,14 +114,12 @@ namespace SudokuSharp.ViewModels
             analyse();
             solveWhereOnlyOneNumberIsAvailable();
 
-            for (int x = 0; x < Cells.Length; x++)
-            {
-                for (int y = 0; y < Cells[x].Length; y++)
+            forEachCell((x, y, cell) =>
                 {
                     var rootCell = GetRootCellIndex(x, y);
 
-                    if (Cells[x][y].Number.HasValue)
-                        continue;
+                    if (cell.Number.HasValue)
+                        return;
 
                     List<int> existingNumbersInTriplet = new List<int>();
                     int numberFilled = 0;
@@ -161,9 +156,7 @@ namespace SudokuSharp.ViewModels
                             }
                         }
                     }
-
-                }
-            }
+                });
         }
 
         private List<int> AvailableNumbers(Point testCell)
