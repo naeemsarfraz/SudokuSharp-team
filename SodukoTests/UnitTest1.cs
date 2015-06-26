@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using SudokuSharp.ViewModels;
 using SudokuSharp.WinApp;
 
 namespace SodukoTests
 {
-    [TestClass]
+    [TestFixture]
     public class UnitTest1
     {
-        [TestMethod]
+        [Test]
         public void TestBlock()
         {
             BoardViewModel model = new BoardViewModel();
@@ -23,7 +23,8 @@ namespace SodukoTests
             Assert.IsTrue(cellViewModels[2].Number == 2);
             
         }
-        [TestMethod]
+
+        [Test]
         public void Testrow()
         {
             BoardViewModel model = new BoardViewModel();
@@ -44,7 +45,7 @@ namespace SodukoTests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestColumn()
         {
             BoardViewModel model = new BoardViewModel();
@@ -65,7 +66,7 @@ namespace SodukoTests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestBlockRoot()
         {
             BoardViewModel model = new BoardViewModel();
