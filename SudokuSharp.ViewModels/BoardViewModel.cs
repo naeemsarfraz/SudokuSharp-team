@@ -21,7 +21,7 @@ namespace SudokuSharp.ViewModels
             }
         }
 
-        public  CellViewModel[][] Cells { get; private set;}
+        public  CellViewModel[][] Cells { get; private set; }
 
         public void SetCell(int x, int y, int value)
         {
@@ -64,16 +64,20 @@ namespace SudokuSharp.ViewModels
 
         public void Solve()
         {
-                for (int x = 0; x < 9; x++)
+                for (int x = 0; x < Cells.Length; x++)
                 {
-                    for (int y = 0; y < 9; y++)
+                    var row = Cells[x];
+
+                    for (int y = 0; y < row.Length; y++)
                     {
                         var rootCell = GetRootCellIndex(x, y);
 
                         if (!Cells[x][y].Number.HasValue)
                         {
                             var availibleNumbers = AvailibleNumbers(new Point(x, y));
+
                             Trace.WriteLine(string.Format("x{0}y{1}{2}", x, y, availibleNumbers.Count));
+
                             if (availibleNumbers.Count == 1)
                             {
                                 SetCell(x, y, availibleNumbers.First());
