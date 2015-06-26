@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSharp.WinApp", "SudokuSharp.WinApp\SudokuSharp.WinApp.csproj", "{643D1CED-9731-43EF-8DF9-222964B5A8C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SudokuSharp.ViewModels", "SudokuSharp.ViewModels\SudokuSharp.ViewModels.csproj", "{71E7360E-B47E-4C91-A67B-400479197E75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SodukoTests", "SodukoTests\SodukoTests.csproj", "{7D7F3C19-BF68-45F4-B672-7354B1D08DBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +21,10 @@ Global
 		{71E7360E-B47E-4C91-A67B-400479197E75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71E7360E-B47E-4C91-A67B-400479197E75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71E7360E-B47E-4C91-A67B-400479197E75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D7F3C19-BF68-45F4-B672-7354B1D08DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D7F3C19-BF68-45F4-B672-7354B1D08DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D7F3C19-BF68-45F4-B672-7354B1D08DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D7F3C19-BF68-45F4-B672-7354B1D08DBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

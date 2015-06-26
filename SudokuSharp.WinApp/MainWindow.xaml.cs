@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using SudokuSharp.ViewModels;
 
 namespace SudokuSharp.WinApp
@@ -27,6 +28,8 @@ namespace SudokuSharp.WinApp
         private void OnSolve(object sender, RoutedEventArgs e)
         {
             // Todo: Solve it
+            _theBoard.Solve();
+
         }
     }
 }

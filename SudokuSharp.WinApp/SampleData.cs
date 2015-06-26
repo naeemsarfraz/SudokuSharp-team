@@ -5,7 +5,7 @@
 
 namespace SudokuSharp.WinApp
 {
-    internal static class SampleData
+    public static class SampleData
     {
         static SampleData()
         {
