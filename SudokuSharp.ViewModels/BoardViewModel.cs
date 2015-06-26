@@ -76,7 +76,8 @@ namespace SudokuSharp.ViewModels
                         {
                             var availibleNumbers = AvailibleNumbers(new Point(x, y));
 
-                            Trace.WriteLine(string.Format("x{0}y{1}{2}", x, y, availibleNumbers.Count));
+                            Debug.WriteLine("cell[{0}][{1}] has {2} numbers available {{{3}}}", 
+                                x, y, availibleNumbers.Count, String.Join(",", availibleNumbers.ToArray()));
 
                             if (availibleNumbers.Count == 1)
                             {
