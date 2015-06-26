@@ -74,7 +74,7 @@ namespace SudokuSharp.ViewModels
                             Trace.WriteLine(string.Format("x{0}y{1}{2}", x, y, availibleNumbers.Count));
                             if (availibleNumbers.Count == 1)
                             {
-                                Cells[x][y].Number = availibleNumbers.First();
+                                SetCell(x, y, availibleNumbers.First());
                             }
 
                             List<int> existingNumbersInTriplet = new List<int>();
@@ -111,7 +111,7 @@ namespace SudokuSharp.ViewModels
                                 {
                                     if (!existingNumbersInTriplet.Contains(cellValue))
                                     {
-                                        Cells[x][y].Number = cellValue;
+                                        SetCell(x, y, cellValue);
                                     }
                                 }
                             }
