@@ -65,16 +65,5 @@ namespace SodukoTests
             Assert.IsTrue(cellViewModels[8].Number == null);
 
         }
-
-        [Test]
-        public void TestBlockRoot()
-        {
-            BoardViewModel model = new BoardViewModel();
-            model.NewPuzzle(SampleData.StarterPuzzles[0]);
-
-
-            Assert.IsTrue(model.GetBlockRootIndex(new Point(0,0)) == new Point(0,0));
-            Assert.IsTrue(model.GetBlockRootIndex(new Point(8, 8)) == new Point(6,6));
-        }
     }
 }

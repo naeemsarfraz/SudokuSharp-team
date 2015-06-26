@@ -68,6 +68,8 @@ namespace SudokuSharp.ViewModels
                 {
                     for (int y = 0; y < 9; y++)
                     {
+                        var rootCell = GetRootCellIndex(x, y);
+
                         if (!Cells[x][y].Number.HasValue)
                         {
                             var availibleNumbers = AvailibleNumbers(new Point(x, y));
@@ -81,9 +83,9 @@ namespace SudokuSharp.ViewModels
                             int numberFilled = 0;
                             for (int i = 0; i < 3; i++)
                             {
-                                if (Cells[i + (x - x%3)][y].Number.HasValue)
+                                if (Cells[i + (rootCell.X)][y].Number.HasValue)
                                 {
-                                    existingNumbersInTriplet.Add(Cells[i + (x - x%3)][y].Number.Value);
+                                    existingNumbersInTriplet.Add(Cells[i + (rootCell.X)][y].Number.Value);
                                          numberFilled++;
                                 }
                                
@@ -92,9 +94,8 @@ namespace SudokuSharp.ViewModels
 
                             if (numberFilled == 2)
                             {
-                                int root = y - (y%3);
                                 List<int> columnIndexes = new List<int>();
-                                for (int i = root; i < root+3; i++)
+                                for (int i = rootCell.Y; i < rootCell.Y+3; i++)
                                 {
                                     if (y == i)
                                         continue;
@@ -102,8 +103,8 @@ namespace SudokuSharp.ViewModels
                                     columnIndexes.Add(i);
                                 }
 
-                                List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], GetBlockRootIndex(new Point(x,y))).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-                                List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], GetBlockRootIndex(new Point(x,y))).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
+                                List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
+                                List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
 
                                 List<int> cellValues = inuse1.Intersect(inuse2).ToList();
 
@@ -138,7 +139,7 @@ namespace SudokuSharp.ViewModels
         {
             List<int> fullNumbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-            List<CellViewModel> block = GetBlock(GetBlockRootIndex(testCell));
+            List<CellViewModel> block = GetBlock(GetRootCellIndex(testCell.X, testCell.Y));
 
             var row = GetRow(testCell.X);
 
@@ -216,9 +217,9 @@ namespace SudokuSharp.ViewModels
             return cellViewModels;
         }
 
-        public Point GetBlockRootIndex(Point point)
+        public Point GetRootCellIndex(int x, int y)
         {
-            return new Point(point.X-point.X%3,point.Y - point.Y%3);
+            return new Point(x-x%3, y-y%3);
         }
     }
 }
