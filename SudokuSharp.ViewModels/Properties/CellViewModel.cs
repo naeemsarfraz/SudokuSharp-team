@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using SudokuSharp.ViewModels.Annotations;
 
@@ -12,11 +13,14 @@ namespace SudokuSharp.ViewModels
             set
             {
                 _number = value;
+                if (_number != null)
+                    PossibleValues = new List<int>();
                 OnPropertyChanged();
             }
         }
         private int? _number;
 
+        public List<int> PossibleValues { get; set; }
 
         #region Property Change Support
 
