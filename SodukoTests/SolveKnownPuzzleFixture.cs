@@ -9,7 +9,7 @@ using SudokuSharp.WinApp;
 namespace SodukoTests
 {
     [TestFixture]
-    public class UnitTest1
+    public class SolveKnownPuzzleFixture
     {
         [Test]
         public void TestBlock()
