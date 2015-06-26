@@ -16,16 +16,16 @@ namespace SudokuSharp.ViewModels
                 Cells[x] = new CellViewModel[9];
                 for (var y = 0; y < 9; y++)
                 {
-                    Cells[x][y] = new CellViewModel() {Number = 2};
+                    Cells[x][y] = new CellViewModel() { Number = 2 };
                 }
             }
         }
 
-        public  CellViewModel[][] Cells { get; private set; }
+        public CellViewModel[][] Cells { get; private set; }
 
         public void SetCell(int x, int y, int value)
         {
-            if( !(InRange(x, 0, 8) && InRange(y, 0, 8) && InRange(value, 1, 9)) )
+            if (!(InRange(x, 0, 8) && InRange(y, 0, 8) && InRange(value, 1, 9)))
                 throw new ArgumentException(string.Format("Error Setting cell[{0}][{1}] to {2}.", x, y, value));
 
             Cells[x][y].Number = value;
@@ -51,93 +51,76 @@ namespace SudokuSharp.ViewModels
         {
             var xLength = puzzleData.GetLength(0);
             var yLength = puzzleData.GetLength(1);
-            if(xLength != 9 || yLength != 9) throw new ArgumentException("Puzzle data needs to be 9x9 array");
+            if (xLength != 9 || yLength != 9) throw new ArgumentException("Puzzle data needs to be 9x9 array");
 
             for (var x = 0; x < 9; x++)
             {
                 for (var y = 0; y < 9; y++)
                 {
-                    Cells[x][y].Number = puzzleData[x,y];
+                    Cells[x][y].Number = puzzleData[x, y];
                 }
             }
         }
 
         public void Solve()
         {
-                for (int x = 0; x < Cells.Length; x++)
+            for (int x = 0; x < Cells.Length; x++)
+            {
+                for (int y = 0; y < Cells[x].Length; y++)
                 {
-                    var row = Cells[x];
+                    var rootCell = GetRootCellIndex(x, y);
 
-                    for (int y = 0; y < row.Length; y++)
+                    if (Cells[x][y].Number.HasValue)
+                        continue;
+
+                    var availibleNumbers = AvailibleNumbers(new Point(x, y));
+
+                    Debug.WriteLine("cell[{0}][{1}] has {2} numbers available {{{3}}}",
+                        x, y, availibleNumbers.Count, String.Join(",", availibleNumbers.ToArray()));
+
+                    if (availibleNumbers.Count == 1)
                     {
-                        var rootCell = GetRootCellIndex(x, y);
+                        SetCell(x, y, availibleNumbers.First());
+                    }
 
-                        if (!Cells[x][y].Number.HasValue)
+                    List<int> existingNumbersInTriplet = new List<int>();
+                    int numberFilled = 0;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        if (Cells[i + (rootCell.X)][y].Number.HasValue)
                         {
-                            var availibleNumbers = AvailibleNumbers(new Point(x, y));
+                            existingNumbersInTriplet.Add(Cells[i + (rootCell.X)][y].Number.Value);
+                            numberFilled++;
+                        }
+                    }
 
-                            Debug.WriteLine("cell[{0}][{1}] has {2} numbers available {{{3}}}", 
-                                x, y, availibleNumbers.Count, String.Join(",", availibleNumbers.ToArray()));
+                    if (numberFilled == 2)
+                    {
+                        List<int> columnIndexes = new List<int>();
+                        for (int i = rootCell.Y; i < rootCell.Y + 3; i++)
+                        {
+                            if (y == i)
+                                continue;
 
-                            if (availibleNumbers.Count == 1)
-                            {
-                                SetCell(x, y, availibleNumbers.First());
-                            }
-
-                            List<int> existingNumbersInTriplet = new List<int>();
-                            int numberFilled = 0;
-                            for (int i = 0; i < 3; i++)
-                            {
-                                if (Cells[i + (rootCell.X)][y].Number.HasValue)
-                                {
-                                    existingNumbersInTriplet.Add(Cells[i + (rootCell.X)][y].Number.Value);
-                                         numberFilled++;
-                                }
-                               
-
-                            }
-
-                            if (numberFilled == 2)
-                            {
-                                List<int> columnIndexes = new List<int>();
-                                for (int i = rootCell.Y; i < rootCell.Y+3; i++)
-                                {
-                                    if (y == i)
-                                        continue;
-                                    
-                                    columnIndexes.Add(i);
-                                }
-
-                                List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-                                List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-
-                                List<int> cellValues = inuse1.Intersect(inuse2).ToList();
-
-                                foreach (var cellValue in cellValues)
-                                {
-                                    if (!existingNumbersInTriplet.Contains(cellValue))
-                                    {
-                                        SetCell(x, y, cellValue);
-                                    }
-                                }
-                            }
+                            columnIndexes.Add(i);
                         }
 
+                        List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
+                        List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
+
+                        List<int> cellValues = inuse1.Intersect(inuse2).ToList();
+
+                        foreach (var cellValue in cellValues)
+                        {
+                            if (!existingNumbersInTriplet.Contains(cellValue))
+                            {
+                                SetCell(x, y, cellValue);
+                            }
+                        }
                     }
+
                 }
-
-
-
-
-
-
-
-            //foreach (var VARIABLE in Cells)
-            //{
-
-            //}
-
-            //DataContext
+            }
         }
 
         private List<int> AvailibleNumbers(Point testCell)
@@ -224,7 +207,7 @@ namespace SudokuSharp.ViewModels
 
         public Point GetRootCellIndex(int x, int y)
         {
-            return new Point(x-x%3, y-y%3);
+            return new Point(x - x % 3, y - y % 3);
         }
     }
 }
