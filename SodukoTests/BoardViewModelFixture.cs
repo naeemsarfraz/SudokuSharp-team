@@ -29,5 +29,27 @@ namespace SodukoTests
             Assert.AreEqual(expectedX, result.X);
             Assert.AreEqual(expectedY, result.Y);
         }
+
+        [Test]
+        public void RotateBoardClockwise()
+        {
+            //Arrange
+            int? _ = null;
+            var board = new int?[2][]
+                {
+                    
+                    new int?[]{1, 2},
+                    new int?[]{_, 3}
+                };
+
+            //Act
+            var result = BoardViewModel.Transpose(board);
+
+            //Assert
+            Assert.AreEqual(null, result[0][0]);
+            Assert.AreEqual(1, result[0][1]);
+            Assert.AreEqual(3, result[1][0]);
+            Assert.AreEqual(2, result[1][1]);
+        }
     }
 }

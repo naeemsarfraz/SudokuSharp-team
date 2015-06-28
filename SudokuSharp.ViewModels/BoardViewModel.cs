@@ -62,9 +62,9 @@ namespace SudokuSharp.ViewModels
             }
         }
 
-        private void analyse()
+        private void Analyse()
         {
-            forEachCell((x, y, cell) =>
+            ForEachCell((x, y, cell) =>
                 {
                     if (cell.Number.HasValue)
                     {
@@ -81,18 +81,18 @@ namespace SudokuSharp.ViewModels
                 });
         }
 
-        private void solveWhereOnlyOneNumberIsAvailable()
+        private void SolveWhereOnlyOneNumberIsAvailable()
         {
-            forEachCell((x, y, cell) =>
+            ForEachCell((x, y, cell) =>
                 {
                     if (Cells[x][y].Number == null && cell.PossibleValues.Count == 1)
                         SetCell(x, y, cell.PossibleValues.First());
                 });
         }
 
-        private void forEachCell(Action<int, int, CellViewModel> onEachCell)
+        private void ForEachCell(Action<int, int, CellViewModel> onEachCell)
         {
-            forEachRow((row) =>
+            ForEachRow((row) =>
             {
                 for (int y = 0; y < Cells[row].Length; y++)
                 {
@@ -101,7 +101,7 @@ namespace SudokuSharp.ViewModels
             });
         }
 
-        private void forEachRow(Action<int> onEachRow)
+        private void ForEachRow(Action<int> onEachRow)
         {
             for (int x = 0; x < Cells.Length; x++)
             {
@@ -111,52 +111,81 @@ namespace SudokuSharp.ViewModels
 
         public void Solve()
         {
-            analyse();
-            solveWhereOnlyOneNumberIsAvailable();
+            Analyse();
+            SolveWhereOnlyOneNumberIsAvailable();
+            SolveWhereTwoColumnsFilledInInlineBlockColumn();
+            //Cells = Transpose(Cells);
+            //SolveWhereTwoColumnsFilledInInlineBlockColumn();
+            //UndoTranspose();
+            
+        }
 
-            forEachCell((x, y, cell) =>
+        private void UndoTranspose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static int?[][] Transpose(int?[][] data)
+        {
+            int?[][] result = new int?[data.Length][];
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                result[i] = new int?[data[i].Length];
+                for (int j = 0; j < data[i].Length; j++)
                 {
-                    var rootCell = GetRootCellIndex(x, y);
+                    result[i][j] = data[data.Length - j - 1][i];
+                }
+            }
 
-                    if (cell.Number.HasValue)
-                        return;
+            return result;
+        }
 
-                    List<int> existingNumbersInTriplet = new List<int>();
-                    int numberFilled = 0;
-                    for (int i = 0; i < 3; i++)
+        private void SolveWhereTwoColumnsFilledInInlineBlockColumn()
+        {
+            ForEachCell((x, y, cell) =>
+            {
+                var rootCell = GetRootCellIndex(x, y);
+
+                if (cell.Number.HasValue)
+                    return;
+
+                List<int> existingNumbersInTriplet = new List<int>();
+                int numberFilled = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (Cells[i + (rootCell.X)][y].Number.HasValue)
                     {
-                        if (Cells[i + (rootCell.X)][y].Number.HasValue)
-                        {
-                            existingNumbersInTriplet.Add(Cells[i + (rootCell.X)][y].Number.Value);
-                            numberFilled++;
-                        }
+                        existingNumbersInTriplet.Add(Cells[i + (rootCell.X)][y].Number.Value);
+                        numberFilled++;
+                    }
+                }
+
+                if (numberFilled == 2)
+                {
+                    List<int> columnIndexes = new List<int>();
+                    for (int i = rootCell.Y; i < rootCell.Y + 3; i++)
+                    {
+                        if (y == i)
+                            continue;
+
+                        columnIndexes.Add(i);
                     }
 
-                    if (numberFilled == 2)
+                    List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
+                    List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
+
+                    List<int> cellValues = inuse1.Intersect(inuse2).ToList();
+
+                    foreach (var cellValue in cellValues)
                     {
-                        List<int> columnIndexes = new List<int>();
-                        for (int i = rootCell.Y; i < rootCell.Y + 3; i++)
+                        if (!existingNumbersInTriplet.Contains(cellValue))
                         {
-                            if (y == i)
-                                continue;
-
-                            columnIndexes.Add(i);
-                        }
-
-                        List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-                        List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-
-                        List<int> cellValues = inuse1.Intersect(inuse2).ToList();
-
-                        foreach (var cellValue in cellValues)
-                        {
-                            if (!existingNumbersInTriplet.Contains(cellValue))
-                            {
-                                SetCell(x, y, cellValue);
-                            }
+                            SetCell(x, y, cellValue);
                         }
                     }
-                });
+                }
+            });
         }
 
         private List<int> AvailableNumbers(Point testCell)
