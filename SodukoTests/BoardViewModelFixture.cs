@@ -35,21 +35,32 @@ namespace SodukoTests
         {
             //Arrange
             int? _ = null;
-            var board = new int?[2][]
+            var board = new int?[9,9]
                 {
-                    
-                    new int?[]{1, 2},
-                    new int?[]{_, 3}
+                    {_, _, 2, _, _, _, 8, _, _},
+                    {1, _, _, 2, _, _, _, 4, _},
+                    {3, _, 6, 8, _, _, 7, 2, _},
+                    {_, _, 5, 3, _, _, _, _, 8},
+                    {_, 2, _, _, _, _, _, 9, _},
+                    {6, _, _, _, _, 1, 5, _, _},
+                    {_, 5, 7, _, _, 3, 2, _, 1},
+                    {_, 1, _, _, _, 7, _, _, 6},
+                    {_, _, 3, _, _, _, 4, _, _}
                 };
+            var model = new BoardViewModel();
+            model.NewPuzzle(board);
 
             //Act
-            var result = BoardViewModel.Transpose(board);
+            model.Rotate();
 
             //Assert
-            Assert.AreEqual(null, result[0][0]);
-            Assert.AreEqual(1, result[0][1]);
-            Assert.AreEqual(3, result[1][0]);
-            Assert.AreEqual(2, result[1][1]);
+            Assert.AreEqual(null, model.Cells[0][0].Number);
+            Assert.AreEqual(5, model.Cells[1][2].Number);
+            Assert.AreEqual(3, model.Cells[2][0].Number);
+
+            Assert.AreEqual(7, model.Cells[6][6].Number);
+            Assert.AreEqual(2, model.Cells[7][6].Number);
+            Assert.AreEqual(4, model.Cells[7][7].Number);
         }
     }
 }
