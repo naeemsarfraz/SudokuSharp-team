@@ -128,25 +128,19 @@ namespace SudokuSharp.ViewModels
             throw new NotImplementedException();
         }
 
-        private static int?[,] Transpose(CellViewModel[][] data)
+        public void Rotate()
         {
-            int?[,] result = new int?[data.Length, data.Length];
+            int?[,] result = new int?[Cells.Length, Cells.Length];
 
-            for (int i = 0; i < data.Length; i++)
+            for (int i = 0; i < Cells.Length; i++)
             {
-                for (int j = 0; j < data[i].Length; j++)
+                for (int j = 0; j < Cells[i].Length; j++)
                 {
-                    result[i,j] = data[data.Length - j - 1][i].Number;
+                    result[i, j] = Cells[Cells.Length - j - 1][i].Number;
                 }
             }
 
-            return result;
-        }
-
-        public void Rotate()
-        {
-            var data = Transpose(Cells);
-            NewPuzzle(data);
+            NewPuzzle(result);
         }
 
         private void SolveWhereTwoColumnsFilledInInlineBlockColumn()
