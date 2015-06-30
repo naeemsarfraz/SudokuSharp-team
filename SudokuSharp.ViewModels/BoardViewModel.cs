@@ -8,6 +8,12 @@ namespace SudokuSharp.ViewModels
 {
     public class BoardViewModel
     {
+        public enum RotateDirection
+        {
+            Clockwise = 0,
+            CounterClockwise
+        }
+
         public BoardViewModel()
         {
             Cells = new CellViewModel[9][];
@@ -116,29 +122,27 @@ namespace SudokuSharp.ViewModels
             Analyse();
             SolveWhereTwoColumnsFilledInInlineBlockColumn();
             Analyse();
-            Rotate();
+            Rotate(RotateDirection.Clockwise);
             SolveWhereTwoColumnsFilledInInlineBlockColumn();
+            Rotate(RotateDirection.CounterClockwise);
             Analyse();
-            //UndoTranspose();
-            
         }
 
-        private void UndoTranspose()
+        public void Rotate(RotateDirection direction)
         {
-            throw new NotImplementedException();
-        }
+            if (!Enum.IsDefined(typeof(RotateDirection), direction))
+                throw new ArgumentOutOfRangeException("direction");
 
-        public void Rotate()
-        {
             int?[,] result = new int?[Cells.Length, Cells.Length];
 
-            for (int i = 0; i < Cells.Length; i++)
+            ForEachCell((x, y, cell) =>
             {
-                for (int j = 0; j < Cells[i].Length; j++)
-                {
-                    result[i, j] = Cells[Cells.Length - j - 1][i].Number;
-                }
-            }
+                if (direction == RotateDirection.Clockwise)
+                    result[x, y] = Cells[Cells.Length - y - 1][x].Number;
+                else if (direction == RotateDirection.CounterClockwise)
+                    result[x, y] = Cells[y][Cells.Length - x - 1].Number;
+
+            });
 
             NewPuzzle(result);
         }
