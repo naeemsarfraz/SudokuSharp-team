@@ -15,8 +15,7 @@ namespace SodukoTests
 
         [Test]
         [TestCaseSource("OnePossibleAnswerCases")]
-        [TestCaseSource("ThirdRemainingColumnWithOneOptionAnswerCases")]
-        [TestCaseSource("ThirdRemainingColumnUseOppositeDimensionAnswerCases")]
+        [TestCaseSource("OnePossibleInBlock")]
         [TestCaseSource("OnePossibleAnswerForColumn")]
         [TestCaseSource("OnePossibleAnswerForRow")]
         public void SolveCell(int?[,] puzzle, int expectedX, int expectedY, int cellValue)
@@ -55,7 +54,7 @@ namespace SodukoTests
         }
 
         #region Test Case Sources
-        private static object[] OnePossibleAnswerForRow =
+        private static readonly object[] OnePossibleAnswerForRow =
         {
             new object[] { new int?[9,9] {
                 {1, 2, 3, 4, _, 6, _, 8, 9},
@@ -69,7 +68,7 @@ namespace SodukoTests
                 {_, _, _, _, _, _, _, _, _}
             }, 0, 6, 7 }
         };
-        private static object[] OnePossibleAnswerForColumn =
+        private static readonly object[] OnePossibleAnswerForColumn =
         {
             new object[] { new int?[9,9] {
                 {1, _, _, _, _, _, _, _, _},
@@ -83,7 +82,7 @@ namespace SodukoTests
                 {9, _, _, _, _, _, _, _, _}
             }, 4, 0, 5 }
         };
-        static object[] ThirdRemainingColumnUseOppositeDimensionAnswerCases = 
+        static readonly object[] OnePossibleInBlock = 
         {
             new object[] { new int?[9,9] {
                 {1, _, _, _, _, _, _, _, _},
@@ -106,10 +105,7 @@ namespace SodukoTests
                 {_, _, _, _, _, _, _, _, _},
                 {_, _, _, _, _, _, _, _, _},
                 {_, _, _, _, _, 9, _, _, _}
-            }, 5, 4, 9 }
-        };
-        static object[] ThirdRemainingColumnWithOneOptionAnswerCases = 
-        {
+            }, 5, 4, 9 },
             new object[] { new int?[9,9] {
                 {1, _, _, _, _, _, _, _, _},
                 {_, _, _, _, _, _, _, _, _},
@@ -133,7 +129,7 @@ namespace SodukoTests
                 {_, _, _, _, _, _, _, _, _}
             }, 2, 1, 1 }
         };
-        static object[] OnePossibleAnswerCases = 
+        static readonly object[] OnePossibleAnswerCases = 
         {
             new object[] { new int?[9,9] {
                 {_, 2, 3, 4, 5, 6, 7, 8, 9},
