@@ -82,62 +82,15 @@ namespace SudokuSharp.ViewModels
             }
         }
 
-        private void Analyse()
-        {
-            ForEachCell((x, y, cell) =>
-                {
-                    if (cell.Number.HasValue)
-                    {
-                        cell.PossibleValues.Clear();
-                        return;
-                    }
-
-                    var available = AvailableNumbers(new Point(x, y));
-
-                    Debug.WriteLine("cell[{0}][{1}] has {2} numbers available {{{3}}}",
-                        x, y, available.Count, String.Join(",", available.ToArray()));
-
-                    cell.PossibleValues = available;
-                });
-        }
-
-        private void SolveWhereOnlyOneNumberIsAvailable()
-        {
-            ForEachCell((x, y, cell) =>
-                {
-                    if (Cells[x][y].Number == null && cell.PossibleValues.Count == 1)
-                        SetCell(x, y, cell.PossibleValues.First());
-                });
-        }
-
-        private void ForEachCell(Action<int, int, CellViewModel> onEachCell)
-        {
-            ForEachRow((row) =>
-            {
-                for (int y = 0; y < Cells[row].Length; y++)
-                {
-                    onEachCell(row, y, Cells[row][y]);
-                }
-            });
-        }
-
-        private void ForEachRow(Action<int> onEachRow)
-        {
-            for (int x = 0; x < Cells.Length; x++)
-            {
-                onEachRow(x);
-            }
-        }
-
         public bool IsSolved()
         {
             bool isSolved = true;
 
             ForEachCell((x, y, cell) =>
-                {
-                    if (cell.Number == null)
-                        isSolved = false;
-                });
+            {
+                if (cell.Number == null)
+                    isSolved = false;
+            });
 
             return isSolved;
         }
@@ -146,13 +99,13 @@ namespace SudokuSharp.ViewModels
         {
             ifSolving = true;
 
-            while(!IsSolved())
+            while (!IsSolved())
             {
                 isDirty = false;
                 SolveNextCell();
 
                 if (!isDirty)
-                    throw new IAmStuckException(); 
+                    throw new IAmStuckException();
             }
         }
 
@@ -171,23 +124,13 @@ namespace SudokuSharp.ViewModels
             Analyse();
         }
 
-        public void Rotate(RotateDirection direction)
+        private void SolveWhereOnlyOneNumberIsAvailable()
         {
-            if (!Enum.IsDefined(typeof(RotateDirection), direction))
-                throw new ArgumentOutOfRangeException("direction");
-
-            int?[,] result = new int?[Cells.Length, Cells.Length];
-
             ForEachCell((x, y, cell) =>
-            {
-                if (direction == RotateDirection.Clockwise)
-                    result[x, y] = Cells[Cells.Length - y - 1][x].Number;
-                else if (direction == RotateDirection.CounterClockwise)
-                    result[x, y] = Cells[y][Cells.Length - x - 1].Number;
-
-            });
-
-            NewPuzzle(result);
+                {
+                    if (Cells[x][y].Number == null && cell.PossibleValues.Count == 1)
+                        SetCell(x, y, cell.PossibleValues.First());
+                });
         }
 
         private void SolveWhereTwoColumnsFilledInInlineBlockColumn()
@@ -237,6 +180,25 @@ namespace SudokuSharp.ViewModels
             });
         }
 
+        private void Analyse()
+        {
+            ForEachCell((x, y, cell) =>
+            {
+                if (cell.Number.HasValue)
+                {
+                    cell.PossibleValues.Clear();
+                    return;
+                }
+
+                var available = AvailableNumbers(new Point(x, y));
+
+                Debug.WriteLine("cell[{0}][{1}] has {2} numbers available {{{3}}}",
+                    x, y, available.Count, String.Join(",", available.ToArray()));
+
+                cell.PossibleValues = available;
+            });
+        }
+
         private List<int> AvailableNumbers(Point testCell)
         {
             List<int> fullNumbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -255,6 +217,44 @@ namespace SudokuSharp.ViewModels
 
             List<int> availibleNumbers = fullNumbers.Except(numbersInUse).ToList();
             return availibleNumbers;
+        }
+
+        public void Rotate(RotateDirection direction)
+        {
+            if (!Enum.IsDefined(typeof(RotateDirection), direction))
+                throw new ArgumentOutOfRangeException("direction");
+
+            int?[,] result = new int?[Cells.Length, Cells.Length];
+
+            ForEachCell((x, y, cell) =>
+            {
+                if (direction == RotateDirection.Clockwise)
+                    result[x, y] = Cells[Cells.Length - y - 1][x].Number;
+                else if (direction == RotateDirection.CounterClockwise)
+                    result[x, y] = Cells[y][Cells.Length - x - 1].Number;
+
+            });
+
+            NewPuzzle(result);
+        }
+
+        private void ForEachCell(Action<int, int, CellViewModel> onEachCell)
+        {
+            ForEachRow((row) =>
+            {
+                for (int y = 0; y < Cells[row].Length; y++)
+                {
+                    onEachCell(row, y, Cells[row][y]);
+                }
+            });
+        }
+
+        private void ForEachRow(Action<int> onEachRow)
+        {
+            for (int x = 0; x < Cells.Length; x++)
+            {
+                onEachRow(x);
+            }
         }
 
         public List<CellViewModel> GetBlock(Point offset)
