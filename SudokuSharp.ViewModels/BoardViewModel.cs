@@ -122,6 +122,39 @@ namespace SudokuSharp.ViewModels
             SolveWhereTwoColumnsFilledInInlineBlockColumn();
             Rotate(RotateDirection.CounterClockwise);
             Analyse();
+            SolveWhereOneOptionWithinBlock();
+        }
+
+        private void SolveWhereOneOptionWithinBlock()
+        {
+            for (int i = 0; i < 9; i = i + 3)
+            {
+                for (int j = 0; j < 9; j = j + 3)
+                {
+                    var cellsInBlock = GetBlock(new Point(i, j));
+                    Dictionary<int, int> count = new Dictionary<int, int>();
+                    foreach (var i1 in Enumerable.Range(1, 9))
+                    {
+                        count.Add(i1, 0);
+                    }
+
+                    foreach (var cellViewModel in cellsInBlock)
+                    {
+                        foreach (var possibleValue in cellViewModel.PossibleValues)
+                        {
+                            count[possibleValue]++;
+                        }
+                    }
+
+                    foreach (var i1 in count.Where(v => v.Value == 1))
+                    {
+                        foreach (var cellViewModel in cellsInBlock.Where(v => v.PossibleValues.Contains(i1.Key)))
+                        {
+                            cellViewModel.Number = i1.Key;
+                        }
+                    }
+                }
+            }
         }
 
         private void SolveWhereOnlyOneNumberIsAvailable()
