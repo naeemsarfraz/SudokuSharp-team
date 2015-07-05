@@ -116,13 +116,8 @@ namespace SudokuSharp.ViewModels
             Analyse();
             SolveWhereOnlyOneNumberIsAvailable();
             Analyse();
-            SolveWhereTwoColumnsFilledInInlineBlockColumn();
-            Analyse();
-            Rotate(RotateDirection.Clockwise);
-            SolveWhereTwoColumnsFilledInInlineBlockColumn();
-            Rotate(RotateDirection.CounterClockwise);
-            Analyse();
             SolveWhereOneOptionWithinBlock();
+            Analyse();
         }
 
         private void SolveWhereOneOptionWithinBlock()
@@ -164,53 +159,6 @@ namespace SudokuSharp.ViewModels
                     if (Cells[x][y].Number == null && cell.PossibleValues.Count == 1)
                         SetCell(x, y, cell.PossibleValues.First());
                 });
-        }
-
-        private void SolveWhereTwoColumnsFilledInInlineBlockColumn()
-        {
-            ForEachCell((x, y, cell) =>
-            {
-                var rootCell = GetRootCellIndex(x, y);
-
-                if (cell.Number.HasValue)
-                    return;
-
-                List<int> existingNumbersInTriplet = new List<int>();
-                int numberFilled = 0;
-                for (int i = 0; i < 3; i++)
-                {
-                    if (Cells[i + (rootCell.X)][y].Number.HasValue)
-                    {
-                        existingNumbersInTriplet.Add(Cells[i + (rootCell.X)][y].Number.Value);
-                        numberFilled++;
-                    }
-                }
-
-                if (numberFilled == 2)
-                {
-                    List<int> columnIndexes = new List<int>();
-                    for (int i = rootCell.Y; i < rootCell.Y + 3; i++)
-                    {
-                        if (y == i)
-                            continue;
-
-                        columnIndexes.Add(i);
-                    }
-
-                    List<int> inuse1 = GetColumnExcludingBlock(columnIndexes[0], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-                    List<int> inuse2 = GetColumnExcludingBlock(columnIndexes[1], rootCell).Where(c => c.Number.HasValue).Select(c => c.Number.Value).ToList();
-
-                    List<int> cellValues = inuse1.Intersect(inuse2).ToList();
-
-                    foreach (var cellValue in cellValues)
-                    {
-                        if (!existingNumbersInTriplet.Contains(cellValue))
-                        {
-                            SetCell(x, y, cellValue);
-                        }
-                    }
-                }
-            });
         }
 
         private void Analyse()
