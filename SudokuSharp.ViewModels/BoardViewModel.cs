@@ -37,6 +37,7 @@ namespace SudokuSharp.ViewModels
                 return;
 
             isDirty = true;
+            Analyse();
         }
 
         public CellViewModel[][] Cells { get; private set; }
@@ -80,6 +81,8 @@ namespace SudokuSharp.ViewModels
                     Cells[x][y].Number = puzzleData[x, y];
                 }
             }
+
+            Analyse();
         }
 
         public bool IsSolved()
@@ -113,11 +116,21 @@ namespace SudokuSharp.ViewModels
         {
             ifSolving = true;
 
-            Analyse();
             SolveWhereOnlyOneNumberIsAvailable();
-            Analyse();
             SolveWhereOneOptionWithinBlock();
-            Analyse();
+            SolveWhereOneOptionWithinRow();
+            Rotate(RotateDirection.Clockwise);
+            SolveWhereOneOptionWithinRow();
+            Rotate(RotateDirection.CounterClockwise);
+        }
+
+        private void SolveWhereOneOptionWithinRow()
+        {
+            ForEachRow((rowIndex) =>
+            {
+                var cellsInRow = GetRow(rowIndex);
+                SolveWhereOneOptionAvailableForASetOfCells(cellsInRow);
+            });
         }
 
         private void SolveWhereOneOptionWithinBlock()
@@ -127,27 +140,32 @@ namespace SudokuSharp.ViewModels
                 for (int j = 0; j < 9; j = j + 3)
                 {
                     var cellsInBlock = GetBlock(new Point(i, j));
-                    Dictionary<int, int> count = new Dictionary<int, int>();
-                    foreach (var i1 in Enumerable.Range(1, 9))
-                    {
-                        count.Add(i1, 0);
-                    }
+                    SolveWhereOneOptionAvailableForASetOfCells(cellsInBlock);
+                }
+            }
+        }
 
-                    foreach (var cellViewModel in cellsInBlock)
-                    {
-                        foreach (var possibleValue in cellViewModel.PossibleValues)
-                        {
-                            count[possibleValue]++;
-                        }
-                    }
+        private static void SolveWhereOneOptionAvailableForASetOfCells(List<CellViewModel> cellsInBlock)
+        {
+            Dictionary<int, int> count = new Dictionary<int, int>();
+            foreach (var i1 in Enumerable.Range(1, 9))
+            {
+                count.Add(i1, 0);
+            }
 
-                    foreach (var i1 in count.Where(v => v.Value == 1))
-                    {
-                        foreach (var cellViewModel in cellsInBlock.Where(v => v.PossibleValues.Contains(i1.Key)))
-                        {
-                            cellViewModel.Number = i1.Key;
-                        }
-                    }
+            foreach (var cellViewModel in cellsInBlock)
+            {
+                foreach (var possibleValue in cellViewModel.PossibleValues)
+                {
+                    count[possibleValue]++;
+                }
+            }
+
+            foreach (var i1 in count.Where(v => v.Value == 1))
+            {
+                foreach (var cellViewModel in cellsInBlock.Where(v => v.PossibleValues.Contains(i1.Key)))
+                {
+                    cellViewModel.Number = i1.Key;
                 }
             }
         }
