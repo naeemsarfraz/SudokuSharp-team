@@ -24,10 +24,32 @@ namespace SodukoTests
             model.NewPuzzle(puzzle);
 
             //Act
-            model.Solve();
+            model.SolveNextCell();
 
             //Assert
             Assert.AreEqual(cellValue, model.Cells[expectedX][expectedY].Number);
+        }
+
+        [Test]
+        public void SolveNotPossible()
+        {
+            //Arrange
+            var model = new BoardViewModel();
+            model.NewPuzzle(new int?[9, 9] {
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _}
+            });
+
+            //Act & Assert
+            Assert.Throws<IAmStuckException>(() => model.SolvePuzzle());
+
         }
 
         #region Test Case Sources

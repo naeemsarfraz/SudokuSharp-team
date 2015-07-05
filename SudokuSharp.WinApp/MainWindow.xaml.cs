@@ -28,7 +28,7 @@ namespace SudokuSharp.WinApp
         private void OnSolve(object sender, RoutedEventArgs e)
         {
             // Todo: Solve it
-            _theBoard.Solve();
+            _theBoard.SolveNextCell();
 
         }
     }

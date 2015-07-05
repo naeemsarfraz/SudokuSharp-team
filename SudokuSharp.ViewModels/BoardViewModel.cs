@@ -14,6 +14,9 @@ namespace SudokuSharp.ViewModels
             CounterClockwise
         }
 
+        bool isDirty = false;
+        private bool ifSolving = false;
+
         public BoardViewModel()
         {
             Cells = new CellViewModel[9][];
@@ -23,8 +26,17 @@ namespace SudokuSharp.ViewModels
                 for (var y = 0; y < 9; y++)
                 {
                     Cells[x][y] = new CellViewModel() { Number = 2 };
+                    Cells[x][y].PropertyChanged += BoardViewModel_PropertyChanged;
                 }
             }
+        }
+
+        void BoardViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (!ifSolving)
+                return;
+
+            isDirty = true;
         }
 
         public CellViewModel[][] Cells { get; private set; }
@@ -55,6 +67,8 @@ namespace SudokuSharp.ViewModels
 
         public void NewPuzzle(int?[,] puzzleData)
         {
+            ifSolving = false;
+
             var xLength = puzzleData.GetLength(0);
             var yLength = puzzleData.GetLength(1);
             if (xLength != 9 || yLength != 9) throw new ArgumentException("Puzzle data needs to be 9x9 array");
@@ -115,8 +129,37 @@ namespace SudokuSharp.ViewModels
             }
         }
 
-        public void Solve()
+        public bool IsSolved()
         {
+            bool isSolved = true;
+
+            ForEachCell((x, y, cell) =>
+                {
+                    if (cell.Number == null)
+                        isSolved = false;
+                });
+
+            return isSolved;
+        }
+
+        public void SolvePuzzle()
+        {
+            ifSolving = true;
+
+            while(!IsSolved())
+            {
+                isDirty = false;
+                SolveNextCell();
+
+                if (!isDirty)
+                    throw new IAmStuckException(); 
+            }
+        }
+
+        public void SolveNextCell()
+        {
+            ifSolving = true;
+
             Analyse();
             SolveWhereOnlyOneNumberIsAvailable();
             Analyse();
