@@ -17,6 +17,8 @@ namespace SodukoTests
         [TestCaseSource("OnePossibleAnswerCases")]
         [TestCaseSource("ThirdRemainingColumnWithOneOptionAnswerCases")]
         [TestCaseSource("ThirdRemainingColumnUseOppositeDimensionAnswerCases")]
+        [TestCaseSource("OnePossibleAnswerForColumn")]
+        [TestCaseSource("OnePossibleAnswerForRow")]
         public void SolveCell(int?[,] puzzle, int expectedX, int expectedY, int cellValue)
         {
             //Arrange
@@ -53,6 +55,34 @@ namespace SodukoTests
         }
 
         #region Test Case Sources
+        private static object[] OnePossibleAnswerForRow =
+        {
+            new object[] { new int?[9,9] {
+                {1, 2, 3, 4, 5, 6, _, 8, 9},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _}
+            }, 0, 6, 7 }
+        };
+        private static object[] OnePossibleAnswerForColumn =
+        {
+            new object[] { new int?[9,9] {
+                {1, _, _, _, _, _, _, _, _},
+                {2, _, _, _, _, _, _, _, _},
+                {3, _, _, _, _, _, _, _, _},
+                {4, _, _, _, _, _, _, _, _},
+                {_, _, _, _, _, _, _, _, _},
+                {6, _, _, _, _, _, _, _, _},
+                {7, _, _, _, _, _, _, _, _},
+                {8, _, _, _, _, _, _, _, _},
+                {9, _, _, _, _, _, _, _, _}
+            }, 4, 0, 5 }
+        };
         static object[] ThirdRemainingColumnUseOppositeDimensionAnswerCases = 
         {
             new object[] { new int?[9,9] {
